@@ -1,0 +1,34 @@
+.player .controller {
+    display: none;
+}
+
+.player:hover div.controller {
+    display: block;
+}
+
+.videoArea::after {
+    content:'';
+    display: block;
+    clear:both;
+}
+
+progress.video {
+    appearance: none;
+}
+progress.video::-webkit-progress-bar {
+    background:#f0f0f0;
+    border-radius:10px;
+    box-shadow: inset 3px 3px 10px #ccc;
+    cursor: pointer;
+}
+progress.video::-webkit-progress-value {
+    border-radius:10px;
+    background: #000000;
+    background: -webkit-linear-gradient(to right, #696969, #000000);
+    background: linear-gradient(to right, #696969, #000000);
+
+}
+
+.current {
+    background: beige;
+}
