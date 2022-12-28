@@ -23,7 +23,7 @@
                 (click)="videoContainer.onProgressbarClick($event)"
                 [value]="videoContainer.currentPlayTime" min="0" [max]="videoContainer.totalPlayTime"></progress>
     </div>
-    <img src="../../../assets/img/Double%20Ring-2.6s-201px.svg"
+    <img [src]="loadingView"
          *ngIf="!videoContainer.isInit"
          style="position:absolute;left:0px;top:0px;" [ngStyle]="{ 'width': videoContainer.width + 'px', 'height' : videoContainer.height}"
     />

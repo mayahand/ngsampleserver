@@ -20,7 +20,7 @@ export class FirstComponent implements OnInit {
 
   ngOnInit() {
     const _this = this;
-    this.delay(3000).then(function () {
+    this.delay(500).then(function () {
       _this.thumbnail1 = new Thumbnail(
           'https://d2njprwt6vp5kv.cloudfront.net/vendor/21913/main/012522newvendorbannersvivacurvydesktop1643647488844.jpg',
           null,
@@ -36,7 +36,7 @@ export class FirstComponent implements OnInit {
       ];
     });
 
-    this.delay(5000).then(function () {
+    this.delay(500).then(function () {
       _this.thumbnail2 = new Thumbnail(
           'https://d2njprwt6vp5kv.cloudfront.net/vendor/21913/main/012522newvendorbannersvivacurvydesktop1643647488844.jpg',
           null,
@@ -49,7 +49,7 @@ export class FirstComponent implements OnInit {
       ];
     });
 
-    this.delay(1000).then(function () {
+    this.delay(500).then(function () {
       _this.thumbnail3 = new Thumbnail(
           'https://d2njprwt6vp5kv.cloudfront.net/vendor/21913/main/012522newvendorbannersvivacurvydesktop1643647488844.jpg',
           null,

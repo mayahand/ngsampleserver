@@ -16,6 +16,7 @@ export class VimeoComponent implements OnInit, AfterViewInit {
   @Input() thumbnail: Thumbnail = null;
   @Input() videos: Video[] = [];
   @Input() autoPlay = true;
+  @Input() loadingView = '/assets/img/Double%20Ring-2.6s-201px.svg';
 
   constructor() {}
 
