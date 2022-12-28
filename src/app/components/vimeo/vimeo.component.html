@@ -12,10 +12,10 @@
             (click)="videoContainer.play()"
             style="position:absolute;top:323px;left:35px;cursor: pointer;font-size: 25px;">▶</span>
       <span *ngIf="videoContainer.volume === true"
-           style="position:absolute;top:330px;left:590px;cursor: pointer;width: 24px; height: 24px;background-image: url('./assets/img/sound_on.png')"
+           style="position:absolute;top:330px;left:590px;cursor: pointer;width: 24px; height: 24px;background-image: url('../../../assets/img/sound_on.png')"
             (click)="videoContainer.setVolume(false)" ></span>
       <span *ngIf="videoContainer.volume === false"
-           style="position:absolute;top:330px;left:590px;cursor: pointer;width: 24px; height: 24px;background-image: url('./assets/img/sound_off.png')"
+           style="position:absolute;top:330px;left:590px;cursor: pointer;width: 24px; height: 24px;background-image: url('../../../assets/img/sound_off.png')"
             (click)="videoContainer.setVolume(true)" ></span>
 
       <progress class="video"
@@ -23,7 +23,7 @@
                 (click)="videoContainer.onProgressbarClick($event)"
                 [value]="videoContainer.currentPlayTime" min="0" [max]="videoContainer.totalPlayTime"></progress>
     </div>
-    <img src="./assets/img/Double Ring-2.6s-201px.svg"
+    <img src="../../../assets/img/Double%20Ring-2.6s-201px.svg"
          *ngIf="!videoContainer.isInit"
          style="position:absolute;left:0px;top:0px;" [ngStyle]="{ 'width': videoContainer.width + 'px', 'height' : videoContainer.height}"
     />

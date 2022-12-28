@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Thumbnail, Video } from '../vimeo/vimeo.component';
+import { Thumbnail, Video } from '../../components/vimeo/vimeo.component';
 
 @Component({
   selector: 'app-first',

@@ -5,7 +5,7 @@ import { AppRoutingModule } from './app-routing.module';
 
 import { AppComponent } from './app.component';
 import { FirstComponent } from './pages/first/first.component';
-import { VimeoComponent } from './pages/vimeo/vimeo.component';
+import { VimeoComponent } from './components/vimeo/vimeo.component';
 
 
 @NgModule({
