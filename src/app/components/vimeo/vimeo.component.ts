@@ -41,6 +41,7 @@ class VideoContainer {
   videos: Video[];
   currentVideo: Video;
   thumbnail: Thumbnail;
+  mainVideo: Video;
   volume = false;
   totalPlayTime = 0;
   currentPlayTime = 0;
@@ -66,6 +67,8 @@ class VideoContainer {
       this.totalPlayTime = this.videos.reduce((previousValue, currentValue) => {
         return previousValue + currentValue.getDuration();
       }, 0);
+
+      this.mainVideo = videos.find(video => video.isMain);
     }
 
     this.currentVideo = this.videos[0];
@@ -88,8 +91,6 @@ class VideoContainer {
         previousValue.nextVideo = currentValue;
         return currentValue;
       }, this.videos[0]);
-
-      this.setCurrentVideo(this.videos[0]);
     }
 
     console.log('total Time: ' + this.totalPlayTime + 's');
@@ -129,8 +130,10 @@ class VideoContainer {
     console.log(video.id + ': onReady');
     const width = video.playerDiv.children('iframe').css('width');
     this.height = video.playerDiv.children('iframe').css('height');
-    this.thumbnail.setSize(width, this.height);
-    this.thumbnail.setShow(true);
+    if (this.thumbnail != null) {
+      this.thumbnail.setSize(width, this.height);
+      this.thumbnail.setShow(true);
+    }
   }
 
   onLoaded(video: Video) {
@@ -171,9 +174,17 @@ class VideoContainer {
   }
 
   play() {
+    if (this.playStatus === PlayStatus.STOPPED) {
+      this.currentPlayTime = 0;
+      this.setCurrentVideo(this.videos[0]);
+      this.currentVideo.stop();
+    }
+
     if (this.currentVideo != null) {
       this.playStatus = PlayStatus.PLAYING;
-      this.thumbnail.setShow(false);
+      if (this.thumbnail != null) {
+        this.thumbnail.setShow(false);
+      }
       this.currentVideo.play();
     }
   }
@@ -183,14 +194,22 @@ class VideoContainer {
     this.currentPlayTime = 0;
     this.setCurrentVideo(null);
     if (this.videos.length > 0) {
-      this.setCurrentVideo(this.videos[0]);
+      if (this.mainVideo != null) {
+        this.setCurrentVideo(this.mainVideo);
+      } else {
+        this.setCurrentVideo(this.videos[0]);
+      }
+      this.currentVideo.stop();
+      this.currentVideo.gotoStillCut();
     }
-    this.thumbnail.setShow(true);
+    if (this.thumbnail != null) {
+      this.thumbnail.setShow(true);
+    }
     this.playStatus = PlayStatus.STOPPED;
   }
 
   pause() {
-    if (this.currentVideo != null && this.playStatus !== PlayStatus.STOPPED) {
+    if (this.currentVideo != null) {
       this.currentVideo.pause();
       this.playStatus = PlayStatus.PAUSED;
     }
@@ -206,6 +225,7 @@ class VideoContainer {
       }
 
       this.setCurrentVideo(this.currentVideo.nextVideo);
+      this.currentVideo.stop();
       this.currentVideo.play();
     }
   }
@@ -217,12 +237,14 @@ class VideoContainer {
 
   seek(timeCode) {
     const playStatus = this.playStatus;
-    this.stop();
+    this.pause();
     const gotoVideo: CurrentVideo = this.calcCurrentVideo(timeCode);
     this.setCurrentVideo(gotoVideo.video);
     const subTime = gotoVideo.video.seek(gotoVideo.startTime);
     this.setCurrentPlayTime(timeCode);
-    this.thumbnail.setShow(false);
+    if (this.thumbnail != null) {
+      this.thumbnail.setShow(false);
+    }
     console.log('Seeked Time' + timeCode + 's');
     console.log('Seeked Video - ID(' + gotoVideo.video.id + ') SubTime(' + subTime + 's)');
     if (playStatus === PlayStatus.PLAYING) {
@@ -237,6 +259,17 @@ class VideoContainer {
 
   onInit() {
     this.isInit = !this.videos.some(video => !video.isInit);
+
+    if (this.isInit) {
+      if (this.mainVideo != null) {
+        this.setCurrentVideo(this.mainVideo);
+      } else {
+        this.setCurrentVideo(this.videos[0]);
+      }
+
+      this.currentVideo.gotoStillCut();
+    }
+
     if (this.isInit && this.autoPlay) {
       this.play();
     }
@@ -254,14 +287,18 @@ export class Video {
   parent: VideoContainer = null;
   currentTimeCode: number;
   callbackMessage: string;
+  isMain: boolean;
   isInit: boolean;
+  stillCutTimeStamp: number;
 
-  constructor(id: number, startTimeCode: number, endTimeCode: number) {
+  constructor(id: number, startTimeCode: number, endTimeCode: number, isMain: boolean, stillCutTimeStamp = 0) {
     this.isInit = false;
     this.id = id;
     this.startTimeCode = startTimeCode;
     this.endTimeCode = endTimeCode;
     this.currentTimeCode = 0;
+    this.isMain = isMain;
+    this.stillCutTimeStamp = stillCutTimeStamp;
   }
 
   init(groupDiv: any, mainPlayer: boolean) {
@@ -292,7 +329,7 @@ export class Video {
       this.player.on('timeupdate', function(data) {
         _this.currentTimeCode = data.seconds;
         _this.parent.onTimeupdate(_this, data);
-        if (data.seconds > _this.endTimeCode) {
+        if (_this.parent.playStatus === PlayStatus.PLAYING && data.seconds > _this.endTimeCode) {
           _this.parent.onEndReached(_this, data);
         }
       });
@@ -345,6 +382,10 @@ export class Video {
     this.currentTimeCode = subTime;
     this.player.setCurrentTime(subTime);
     return subTime;
+  }
+
+  gotoStillCut() {
+    this.player.setCurrentTime(this.stillCutTimeStamp);
   }
 
   setVolume(volume: boolean) {

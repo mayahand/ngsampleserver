@@ -1,7 +1,7 @@
-<app-vimeo *ngIf="thumbnail1 != null && videos1 != null" [group]="'player1'" [width]="640" [thumbnail]="thumbnail1" [videos]="videos1" [autoPlay]="true" [loadingView]="'https://cdn.dribbble.com/users/1787505/screenshots/7300251/media/a351d9e0236c03a539181b95faced9e0.gif'"></app-vimeo>
+<app-vimeo *ngIf="videos1 != null" [group]="'player1'" [width]="640" [videos]="videos1" [autoPlay]="false" [loadingView]="'https://cdn.dribbble.com/users/1787505/screenshots/7300251/media/a351d9e0236c03a539181b95faced9e0.gif'"></app-vimeo>
 <br/>
 
-<app-vimeo *ngIf="thumbnail2 != null && videos2 != null" [group]="'player2'" [width]="640" [thumbnail]="thumbnail2" [videos]="videos2" [autoPlay]="true" [loadingView]="'https://miro.medium.com/max/1400/1*Gvgic29bgoiGVLmI6AVbUg.gif'"></app-vimeo>
+<app-vimeo *ngIf="videos2 != null" [group]="'player2'" [width]="640" [videos]="videos2" [autoPlay]="false" [loadingView]="'https://miro.medium.com/max/1400/1*Gvgic29bgoiGVLmI6AVbUg.gif'"></app-vimeo>
 <br/>
 
-<app-vimeo *ngIf="thumbnail3 != null && videos3 != null" [group]="'player3'" [width]="640" [thumbnail]="thumbnail3" [videos]="videos3" [autoPlay]="true"></app-vimeo>
+<app-vimeo *ngIf="thumbnail != null && videos3 != null" [group]="'player3'" [width]="640" [thumbnail]="thumbnail" [videos]="videos3" [autoPlay]="false"></app-vimeo>
