@@ -12,7 +12,6 @@ export class FirstComponent implements OnInit {
   videos1: Video[];
   videos2: Video[];
   videos3: Video[];
-  width: Number = 640;
 
   constructor() {
   }

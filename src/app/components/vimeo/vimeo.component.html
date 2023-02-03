@@ -1,30 +1,29 @@
-<div [ngStyle]="{ width: width+'px', height: videoContainer.calcVideoHeight(width)+'px'}">
-  <div [id]="group" class="playerContainer">
-    <div class="controller">
-      <button *ngIf="videoContainer.playStatus === 1"
-              (click)="videoContainer.pause()"
-              role="button" class="playbackBtn"><img src="/assets/img/pause-circle.svg"></button>
-      <button *ngIf="videoContainer.playStatus === 0 || videoContainer.playStatus === 2"
-              (click)="videoContainer.play()"
-              role="button" class="playbackBtn"><img src="/assets/img/play-circle.svg"></button>
-      <!--      <span style="position:absolute;top:0px;left:0px;cursor: pointer;width: 24px; height: 24px;background-image: url('../../../assets/img/sound_on.png')"-->
-      <!--            (click)="videoContainer.requestFullscreen()" ></span>-->
-      <progress class="progress"
-                (click)="videoContainer.onProgressbarClick($event)"
-                [value]="videoContainer.currentPlayTime" min="0" [max]="videoContainer.totalPlayTime"></progress>
-      <button *ngIf="videoContainer.volume === true"
-              (click)="videoContainer.setVolume(false)"
-              role="button" class="playbackBtn"><img src="/assets/img/volume-2.svg"></button>
-      <button *ngIf="videoContainer.volume === false"
-              (click)="videoContainer.setVolume(true)"
-              role="button" class="playbackBtn"><img src="/assets/img/volume-x.svg"></button>
-      <button *ngIf="videoContainer.isFullScreen === false"
-              (click)="videoContainer.requestFullscreen()"
-              role="button" class="playbackBtn"><img src="/assets/img/maximize.svg"></button>
-      <button *ngIf="videoContainer.isFullScreen === true"
-              (click)="videoContainer.exitFullscreen()"
-              role="button" class="playbackBtn"><img src="/assets/img/minimize.svg"></button>
-    </div>
+<div #videoGroup [id]="group" class="playerContainer"
+     [ngStyle]="{ width: '100%', height: videoContainer.calcVideoHeight()+'px'}">
+  <div class="controller">
+    <button *ngIf="videoContainer.playStatus === 1"
+            (click)="videoContainer.pause()"
+            role="button" class="playbackBtn"><img src="/assets/img/pause-circle.svg"></button>
+    <button *ngIf="videoContainer.playStatus === 0 || videoContainer.playStatus === 2"
+            (click)="videoContainer.play()"
+            role="button" class="playbackBtn"><img src="/assets/img/play-circle.svg"></button>
+    <!--      <span style="position:absolute;top:0px;left:0px;cursor: pointer;width: 24px; height: 24px;background-image: url('../../../assets/img/sound_on.png')"-->
+    <!--            (click)="videoContainer.requestFullscreen()" ></span>-->
+    <progress class="progress"
+              (click)="videoContainer.onProgressbarClick($event)"
+              [value]="videoContainer.currentPlayTime" min="0" [max]="videoContainer.totalPlayTime"></progress>
+    <button *ngIf="videoContainer.volume === true"
+            (click)="videoContainer.setVolume(false)"
+            role="button" class="playbackBtn"><img src="/assets/img/volume-2.svg"></button>
+    <button *ngIf="videoContainer.volume === false"
+            (click)="videoContainer.setVolume(true)"
+            role="button" class="playbackBtn"><img src="/assets/img/volume-x.svg"></button>
+    <button *ngIf="videoContainer.isFullScreen === false"
+            (click)="videoContainer.requestFullscreen()"
+            role="button" class="playbackBtn"><img src="/assets/img/maximize.svg"></button>
+    <button *ngIf="videoContainer.isFullScreen === true"
+            (click)="videoContainer.exitFullscreen()"
+            role="button" class="playbackBtn"><img src="/assets/img/minimize.svg"></button>
   </div>
 </div>
 <!--<div class="vimeoComponent" style="border: 1px solid green;">-->

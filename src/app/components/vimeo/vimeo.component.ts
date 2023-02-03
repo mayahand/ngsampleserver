@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, Input, OnInit} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import * as $ from 'jquery';
 import Player from '@vimeo/player';
 
@@ -8,11 +8,11 @@ import Player from '@vimeo/player';
   styleUrls: ['./vimeo.component.css']
 })
 export class VimeoComponent implements OnInit, AfterViewInit {
+  @ViewChild('videoGroup') videoGroup: ElementRef;
 
   videoContainer: VideoContainer;
 
   @Input() group: string;
-  @Input() width: number;
   @Input() videos: Video[] = [];
   @Input() autoPlay = true;
 
@@ -27,6 +27,13 @@ export class VimeoComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     this.videoContainer.init();
+
+    $(this.videoGroup.nativeElement).on('fullscreenchange', (event) => {
+      this.videoContainer.isFullScreen = true;
+      if (!document.fullscreenElement) {
+        this.videoContainer.isFullScreen = false;
+      }
+    });
   }
 }
 
@@ -152,7 +159,7 @@ class VideoContainer {
       return previousValue + currentValue.getDuration();
     }, data.seconds - video.startTimeCode));
 
-    console.log('Current Time ' + this.currentPlayTime + 's');
+    // console.log('Current Time ' + this.currentPlayTime + 's');
   }
 
   play() {
@@ -213,7 +220,6 @@ class VideoContainer {
   requestFullscreen() {
     const groupDiv = $('#' + this.groupId);
     groupDiv[0].requestFullscreen();
-    this.isFullScreen = true;
   }
 
   exitFullscreen() {
@@ -222,7 +228,6 @@ class VideoContainer {
     } else if (document.webkitExitFullscreen) {
       document.webkitExitFullscreen();
     }
-    this.isFullScreen = false;
   }
 
   seek(timeCode) {
@@ -262,23 +267,16 @@ class VideoContainer {
     }
   }
 
-  calcVideoWidth(height): number {
+  calcVideoHeight(): number {
     if (!this.isInit) {
       return 0;
     }
-    return this.currentVideo.getVideoWidth() * height / this.currentVideo.getVideoHeight();
-  }
-
-  calcVideoHeight(width): number {
-    if (!this.isInit) {
-      return 0;
-    }
-
-    return this.currentVideo.getVideoHeight() * width / this.currentVideo.getVideoWidth();
+    const w = this.getWidth();
+    return this.currentVideo.getVideoHeight() * w / this.currentVideo.getVideoWidth();
   }
 
   getWidth() {
-    return $('#' + this.groupId)[0].scrollWidth;
+    return $('#' + this.groupId).width();
   }
 }
 
