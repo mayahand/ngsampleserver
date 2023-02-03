@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { Thumbnail, Video } from '../../components/vimeo/vimeo.component';
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import { Video } from '../../components/vimeo/vimeo.component';
 
 @Component({
   selector: 'app-first',
@@ -7,11 +7,12 @@ import { Thumbnail, Video } from '../../components/vimeo/vimeo.component';
   styleUrls: ['./first.component.css']
 })
 export class FirstComponent implements OnInit {
+  @ViewChild('player') player: ElementRef;
 
-  thumbnail: Thumbnail;
   videos1: Video[];
   videos2: Video[];
   videos3: Video[];
+  width: Number = 640;
 
   constructor() {
   }
@@ -19,11 +20,11 @@ export class FirstComponent implements OnInit {
   ngOnInit() {
     const _this = this;
 
-    _this.thumbnail = new Thumbnail(
-        'https://d2njprwt6vp5kv.cloudfront.net/vendor/21913/main/012522newvendorbannersvivacurvydesktop1643647488844.jpg',
-        null,
-        null
-    );
+    // this.delay(1).then(function () {
+    //   _this.videos1 = [
+    //     new Video(742451862, 3, 13, false)
+    //   ];
+    // });
 
     this.delay(1).then(function () {
       _this.videos1 = [
@@ -54,4 +55,23 @@ export class FirstComponent implements OnInit {
     return new Promise(f => setTimeout(f, t));
   }
 
+  requestFullScreen () {
+    if (this.player.nativeElement.requestFullscreen) {
+      this.player.nativeElement.requestFullscreen();
+    } else if (this.player.nativeElement.msRequestFullscreen) {
+      this.player.nativeElement.msRequestFullscreen();
+    } else if (this.player.nativeElement.mozRequestFullScreen) {
+      this.player.nativeElement.mozRequestFullScreen();
+    } else if (this.player.nativeElement.webkitRequestFullscreen) {
+      this.player.nativeElement.webkitRequestFullscreen();
+    }
+  }
+
+  exitFullScreen() {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+    }
+  }
 }

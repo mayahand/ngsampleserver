@@ -1,41 +1,70 @@
-<div class="vimeoComponent">
-  <div>
-    [Whole Video Info]<br/>
-    Current Time : {{ videoContainer.currentPlayTime }}s<br/>
-  </div>
-  <div class="videoArea" [ngStyle]="{ 'height' : videoContainer.height}">
-    <div [id]="group" class="player" style="position:relative;float: left" [ngStyle]="{'width': videoContainer.width + 'px'}">
-      <div class="controller">
-        <span *ngIf="videoContainer.playStatus === 1"
+<div [ngStyle]="{ width: width+'px', height: videoContainer.calcVideoHeight(width)+'px'}">
+  <div [id]="group" class="playerContainer">
+    <div class="controller">
+      <button *ngIf="videoContainer.playStatus === 1"
               (click)="videoContainer.pause()"
-              style="position:absolute;top:324px;left:40px;cursor: pointer;font-size: 25px;font-weight: bold">II</span>
-        <span *ngIf="videoContainer.playStatus === 0 || videoContainer.playStatus === 2"
+              role="button" class="playbackBtn"><img src="/assets/img/pause-circle.svg"></button>
+      <button *ngIf="videoContainer.playStatus === 0 || videoContainer.playStatus === 2"
               (click)="videoContainer.play()"
-              style="position:absolute;top:323px;left:35px;cursor: pointer;font-size: 25px;">▶</span>
-        <span *ngIf="videoContainer.volume === true"
-              style="position:absolute;top:330px;left:590px;cursor: pointer;width: 24px; height: 24px;background-image: url('../../../assets/img/sound_on.png')"
-              (click)="videoContainer.setVolume(false)" ></span>
-        <span *ngIf="videoContainer.volume === false"
-              style="position:absolute;top:330px;left:590px;cursor: pointer;width: 24px; height: 24px;background-image: url('../../../assets/img/sound_off.png')"
-              (click)="videoContainer.setVolume(true)" ></span>
-        <progress class="video"
-                  style="position:absolute;top:336px;width:80%;height:10px;left: 10%;"
-                  (click)="videoContainer.onProgressbarClick($event)"
-                    [value]="videoContainer.currentPlayTime" min="0" [max]="videoContainer.totalPlayTime"></progress>
-      </div>
-      <img [src]="loadingView"
-           *ngIf="!videoContainer.isInit"
-           style="position:absolute;left:0px;top:0px;" [ngStyle]="{ 'width': videoContainer.width + 'px', 'height' : videoContainer.height}"/>
-    </div>
-    <div style="float:left;width:300px;height: 100%;overflow-y: scroll;">
-      <ul>
-        <li *ngFor="let video of videoContainer.videos; index as i;" [ngClass]="(videoContainer.currentVideo.index == i) ? 'current' : ''" >
-          No : {{ i + 1 }}<br/>
-          Id : {{ video.id }}<br/>
-          Range : {{ video.startTimeCode }}s ~ {{ video.endTimeCode }}s<br/>
-          Playing now : {{ video.currentTimeCode }}s
-        </li>
-      </ul>
+              role="button" class="playbackBtn"><img src="/assets/img/play-circle.svg"></button>
+      <!--      <span style="position:absolute;top:0px;left:0px;cursor: pointer;width: 24px; height: 24px;background-image: url('../../../assets/img/sound_on.png')"-->
+      <!--            (click)="videoContainer.requestFullscreen()" ></span>-->
+      <progress class="progress"
+                (click)="videoContainer.onProgressbarClick($event)"
+                [value]="videoContainer.currentPlayTime" min="0" [max]="videoContainer.totalPlayTime"></progress>
+      <button *ngIf="videoContainer.volume === true"
+              (click)="videoContainer.setVolume(false)"
+              role="button" class="playbackBtn"><img src="/assets/img/volume-2.svg"></button>
+      <button *ngIf="videoContainer.volume === false"
+              (click)="videoContainer.setVolume(true)"
+              role="button" class="playbackBtn"><img src="/assets/img/volume-x.svg"></button>
+      <button *ngIf="videoContainer.isFullScreen === false"
+              (click)="videoContainer.requestFullscreen()"
+              role="button" class="playbackBtn"><img src="/assets/img/maximize.svg"></button>
+      <button *ngIf="videoContainer.isFullScreen === true"
+              (click)="videoContainer.exitFullscreen()"
+              role="button" class="playbackBtn"><img src="/assets/img/minimize.svg"></button>
     </div>
   </div>
 </div>
+<!--<div class="vimeoComponent" style="border: 1px solid green;">-->
+<!--  <div>-->
+<!--    Current Time : {{ videoContainer.currentPlayTime }}s<br/>-->
+<!--  </div>-->
+<!--  <div class="videoArea" style="float: left;">-->
+<!--    <div [id]="group" class="player" [ngStyle]="{ width: width+'px', height: videoContainer.calcVideoHeight(width)+'px'}">-->
+<!--      <div class="controller" style="position:absolute;">-->
+<!--        <button *ngIf="videoContainer.playStatus === 1"-->
+<!--                (click)="videoContainer.pause()"-->
+<!--                aria-label="pause"-->
+<!--                role="button"-->
+<!--                class="pauseBtn">II</button>-->
+<!--        <button *ngIf="videoContainer.playStatus === 0 || videoContainer.playStatus === 2"-->
+<!--                (click)="videoContainer.play()"-->
+<!--                aria-label="play"-->
+<!--                role="button"-->
+<!--                class="playBtn">▶</button>-->
+<!--        <span style="position:absolute;top:360px;left:590px;cursor: pointer;width: 24px; height: 24px;background-image: url('../../../assets/img/sound_on.png')"-->
+<!--              (click)="videoContainer.requestFullscreen()" ></span>-->
+<!--        <span *ngIf="videoContainer.volume === true"-->
+<!--              style="position:absolute;top:330px;left:590px;cursor: pointer;width: 24px; height: 24px;background-image: url('../../../assets/img/sound_on.png')"-->
+<!--              (click)="videoContainer.setVolume(false)" ></span>-->
+<!--        <span *ngIf="videoContainer.volume === false"-->
+<!--              style="position:absolute;top:330px;left:590px;cursor: pointer;width: 24px; height: 24px;background-image: url('../../../assets/img/sound_off.png')"-->
+<!--              (click)="videoContainer.setVolume(true)" ></span>-->
+<!--        <progress class="video"-->
+<!--                  style="position:absolute;top:336px;width:80%;height:10px;left: 10%;"-->
+<!--                  (click)="videoContainer.onProgressbarClick($event)"-->
+<!--                  [value]="videoContainer.currentPlayTime" min="0" [max]="videoContainer.totalPlayTime"></progress>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--  <ul style="float:left;width:300px;overflow-y: scroll;" [ngStyle]="{'max-height': videoContainer.calcVideoHeight(width)+'px'}">-->
+<!--    <li *ngFor="let video of videoContainer.videos; index as i;" [ngClass]="(videoContainer.currentVideo.index == i) ? 'current' : ''" >-->
+<!--      No : {{ i + 1 }}<br/>-->
+<!--      Id : {{ video.id }}<br/>-->
+<!--      Range : {{ video.startTimeCode }}s ~ {{ video.endTimeCode }}s<br/>-->
+<!--      Playing now : {{ video.currentTimeCode }}s-->
+<!--    </li>-->
+<!--  </ul>-->
+<!--</div>-->

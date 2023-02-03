@@ -13,18 +13,14 @@ export class VimeoComponent implements OnInit, AfterViewInit {
 
   @Input() group: string;
   @Input() width: number;
-  @Input() thumbnail: Thumbnail = null;
   @Input() videos: Video[] = [];
   @Input() autoPlay = true;
-  @Input() loadingView = '/assets/img/Double%20Ring-2.6s-201px.svg';
 
   constructor() {}
 
   ngOnInit() {
     this.videoContainer = new VideoContainer(
         this.group,
-        this.width,
-        this.thumbnail,
         this.videos,
         this.autoPlay);
   }
@@ -36,11 +32,8 @@ export class VimeoComponent implements OnInit, AfterViewInit {
 
 class VideoContainer {
   groupId: string;
-  width: number;
-  height: string;
   videos: Video[];
   currentVideo: Video;
-  thumbnail: Thumbnail;
   mainVideo: Video;
   volume = false;
   totalPlayTime = 0;
@@ -48,14 +41,13 @@ class VideoContainer {
   playStatus = PlayStatus.STOPPED;
   isInit: boolean;
   autoPlay: boolean;
+  isFullScreen: boolean;
 
-  constructor(groupId: string, width: number, thumbnail: Thumbnail, videos: Video[], autoPlay: boolean) {
+  constructor(groupId: string, videos: Video[], autoPlay: boolean) {
     this.isInit = false;
+    this.isFullScreen = false;
     this.autoPlay = autoPlay;
     this.groupId = groupId;
-    this.width = width;
-    this.height = '0px';
-    this.thumbnail = thumbnail;
     this.videos = [];
     if (videos != null) {
       this.videos = videos;
@@ -76,9 +68,6 @@ class VideoContainer {
 
   init() {
     const groupDiv = $('#' + this.groupId);
-    if (this.thumbnail != null) {
-      this.thumbnail.init(groupDiv, this.width + 'px');
-    }
 
     if (this.videos.length > 0) {
       this.videos.reduce((previousValue, currentValue) => {
@@ -128,12 +117,6 @@ class VideoContainer {
 
   onReady(video: Video) {
     console.log(video.id + ': onReady');
-    const width = video.playerDiv.children('iframe').css('width');
-    this.height = video.playerDiv.children('iframe').css('height');
-    if (this.thumbnail != null) {
-      this.thumbnail.setSize(width, this.height);
-      this.thumbnail.setShow(true);
-    }
   }
 
   onLoaded(video: Video) {
@@ -145,7 +128,6 @@ class VideoContainer {
       return;
     }
     console.log(video.id + ': Play');
-    // this.height = video.playerDiv.children('iframe').css('height');
   }
 
   onEndReached(video: Video, data) {
@@ -182,10 +164,7 @@ class VideoContainer {
 
     if (this.currentVideo != null) {
       this.playStatus = PlayStatus.PLAYING;
-      if (this.thumbnail != null) {
-        this.thumbnail.setShow(false);
-      }
-      this.currentVideo.play();
+      this.currentVideo.play((data) => {});
     }
   }
 
@@ -201,9 +180,6 @@ class VideoContainer {
       }
       this.currentVideo.stop();
       this.currentVideo.gotoStillCut();
-    }
-    if (this.thumbnail != null) {
-      this.thumbnail.setShow(true);
     }
     this.playStatus = PlayStatus.STOPPED;
   }
@@ -223,16 +199,30 @@ class VideoContainer {
         // this.play();
         return;
       }
-
       this.setCurrentVideo(this.currentVideo.nextVideo);
       this.currentVideo.stop();
-      this.currentVideo.play();
+      this.currentVideo.play((data) => {});
     }
   }
 
   setVolume(volume: boolean) {
     this.volume = volume;
     this.videos.forEach(video => video.setVolume(volume));
+  }
+
+  requestFullscreen() {
+    const groupDiv = $('#' + this.groupId);
+    groupDiv[0].requestFullscreen();
+    this.isFullScreen = true;
+  }
+
+  exitFullscreen() {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+    }
+    this.isFullScreen = false;
   }
 
   seek(timeCode) {
@@ -242,9 +232,6 @@ class VideoContainer {
     this.setCurrentVideo(gotoVideo.video);
     const subTime = gotoVideo.video.seek(gotoVideo.startTime);
     this.setCurrentPlayTime(timeCode);
-    if (this.thumbnail != null) {
-      this.thumbnail.setShow(false);
-    }
     console.log('Seeked Time' + timeCode + 's');
     console.log('Seeked Video - ID(' + gotoVideo.video.id + ') SubTime(' + subTime + 's)');
     if (playStatus === PlayStatus.PLAYING) {
@@ -274,6 +261,25 @@ class VideoContainer {
       this.play();
     }
   }
+
+  calcVideoWidth(height): number {
+    if (!this.isInit) {
+      return 0;
+    }
+    return this.currentVideo.getVideoWidth() * height / this.currentVideo.getVideoHeight();
+  }
+
+  calcVideoHeight(width): number {
+    if (!this.isInit) {
+      return 0;
+    }
+
+    return this.currentVideo.getVideoHeight() * width / this.currentVideo.getVideoWidth();
+  }
+
+  getWidth() {
+    return $('#' + this.groupId)[0].scrollWidth;
+  }
 }
 
 export class Video {
@@ -290,6 +296,8 @@ export class Video {
   isMain: boolean;
   isInit: boolean;
   stillCutTimeStamp: number;
+  videoWidth: number;
+  videoHeight: number;
 
   constructor(id: number, startTimeCode: number, endTimeCode: number, isMain: boolean, stillCutTimeStamp = 0) {
     this.isInit = false;
@@ -313,12 +321,15 @@ export class Video {
         this.playerDiv = $('#' + madeId);
       }
 
-      this.playerDiv = $('<div style="display: none" id="' + madeId + '"></div>');
+      this.playerDiv = $('<div style="display: none;width: 100%;height: 100%;" id="' + madeId + '"></div>');
       groupDiv.append(this.playerDiv);
       this.player = new Player(madeId, {
         id: this.id,
-        width: this.parent.width,
+        title: false,
+        byline: false,
+        portrait: false,
         controls: false,
+        keyboard: false,
         autoplay: false,
         autopause: false
       });
@@ -344,6 +355,11 @@ export class Video {
           _this.player.pause().then(function() {
             _this.player.setCurrentTime(_this.startTimeCode);
             _this.isInit = true;
+            const iframe = _this.playerDiv.find('iframe');
+            iframe.attr('width', '100%');
+            iframe.attr('height', '100%');
+            _this.player.getVideoWidth().then((w) => _this.videoWidth = w);
+            _this.player.getVideoHeight().then((h) => _this.videoHeight = h);
             _this.parent.onInit();
           });
         });
@@ -362,12 +378,10 @@ export class Video {
     this.player.setCurrentTime(this.startTimeCode);
   }
 
-  play() {
+  play(callBack: (data: string) => void) {
     const _this = this;
     this.player.play()
-        .then(function(data) {
-          console.log('played');
-        })
+        .then(callBack)
         .catch(function(error) {
           _this.callbackMessage = error.name;
         });
@@ -389,13 +403,29 @@ export class Video {
   }
 
   setVolume(volume: boolean) {
-    if (this.player != null) {
-      this.player.setVolume(volume ? 1 : 0);
+    if (!this.player) {
+      return;
     }
+    this.player.setVolume(volume ? 1 : 0);
+  }
+
+  requestFullscreen() {
+    if (!this.player) {
+      return;
+    }
+    this.player.requestFullscreen();
   }
 
   getDuration() {
     return this.endTimeCode - this.startTimeCode;
+  }
+
+  getVideoWidth() {
+    return this.videoWidth;
+  }
+
+  getVideoHeight() {
+    return this.videoHeight;
   }
 }
 
@@ -406,48 +436,6 @@ class CurrentVideo {
   constructor(startTime: number, video: Video) {
     this.startTime = startTime;
     this.video = video;
-  }
-}
-
-export class Thumbnail {
-  src: string;
-  videoIndex: number;
-  timeCode: number;
-  dom: any;
-  private show: boolean;
-
-  constructor(src: string, videoIndex: number, timeCode: number) {
-    this.src = src;
-    this.videoIndex = videoIndex;
-    this.timeCode = timeCode;
-  }
-
-  init(groupDiv, width) {
-    this.dom = $('<img/>');
-    groupDiv.prepend(this.dom);
-    this.dom.attr('src', this.src);
-    this.dom.css('position', 'absolute');
-    this.dom.css('left', '0px');
-    this.dom.css('top', '0px');
-    this.setSize(width, '0px');
-    this.setShow(false);
-  }
-
-  setSize(width, height) {
-    this.dom.css('width', width);
-    this.dom.css('height', height);
-  }
-
-  setShow(show) {
-    this.show = show;
-    if ((this.videoIndex != null && this.timeCode != null) && show) {
-      return;
-    }
-    this.dom.css('display', show ? 'block' : 'none');
-  }
-
-  isShow() {
-    return this.show;
   }
 }
 

@@ -11,8 +11,8 @@ import { VimeoComponent } from './components/vimeo/vimeo.component';
 @NgModule({
   declarations: [
     AppComponent,
-    FirstComponent,
-    VimeoComponent
+    VimeoComponent,
+    FirstComponent
   ],
   imports: [
     BrowserModule,
