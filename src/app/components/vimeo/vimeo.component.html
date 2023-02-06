@@ -1,5 +1,5 @@
 <div #videoGroup [id]="group" class="playerContainer"
-     [ngStyle]="{ width: '100%', height: videoContainer.calcVideoHeight()+'px'}">
+     [ngStyle]="{ height: videoContainer.calcVideoHeight()+'px'}">
   <div class="controller">
     <button *ngIf="videoContainer.playStatus === 1"
             (click)="videoContainer.pause()"
