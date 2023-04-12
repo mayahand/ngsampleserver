@@ -219,7 +219,11 @@ class VideoContainer {
 
   requestFullscreen() {
     const groupDiv = $('#' + this.groupId);
-    groupDiv[0].requestFullscreen();
+    if (groupDiv[0].requestFullscreen) {
+      groupDiv[0].requestFullscreen();
+    } else if (groupDiv[0].webkitRequestFullscreen) {
+      groupDiv[0].webkitRequestFullscreen();
+    }
   }
 
   exitFullscreen() {
